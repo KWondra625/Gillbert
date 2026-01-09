@@ -7,19 +7,27 @@
   <link rel="stylesheet" href="./assets/media-upload.css" />
 </head>
 <body>
-  <h2>Upload media</h2>
+  <div class="container">
+    <div class="header">
+      <h1>📁 Upload Media</h1>
+      <p>Add photos and videos to your catch</p>
+    </div>
 
-  <label for="catchId">Catch</label>
-  <select id="catchId">
-    <!-- Options will be filled in via JavaScript -->
-  </select>
+    <div class="form-section">
+      <label for="catchId">Select Catch</label>
+      <select id="catchId">
+        <!-- Options will be filled in via JavaScript -->
+      </select>
 
-  <label for="files">Photos / Videos</label>
-  <input id="files" type="file" multiple accept="image/*,video/*" />
+      <label for="files">Photos / Videos</label>
+      <input id="files" type="file" multiple accept="image/*,video/*" />
 
-  <button id="uploadBtn">Upload</button>
-  <div class="muted" id="status"></div>
-  <div class="log" id="log"></div>
+      <button id="uploadBtn" class="primary-button">Upload Files</button>
+      <div id="status" class="status"></div>
+    </div>
+
+    <div id="log" class="log"></div>
+  </div>
 
   <script src="./assets/media-upload.js"></script>
 </body>
