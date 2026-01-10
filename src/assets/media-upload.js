@@ -15,7 +15,10 @@ const el = {
   uploadBtn: document.getElementById('uploadBtn'),
   status: document.getElementById('status'),
   log: document.getElementById('log'),
+  catchSummary: document.getElementById('catchSummary'),
 };
+
+let catchesData = {}; // Store catch data for lookups
 
 function setStatus(msg) {
   el.status.textContent = msg;
@@ -129,11 +132,37 @@ async function loadCatchesIntoDropdown() {
     return;
   }
 
+  // Store catch data for lookup
+  catchesData = {};
+  catches.forEach(c => {
+    catchesData[c.catchId] = c;
+  });
+
   el.catchId.innerHTML = catches
     .map(c => `<option value="${escapeHtml(c.catchId)}">${escapeHtml(c.catchId)}</option>`)
     .join("");
 
+  // Display summary for the first catch
+  const firstCatchId = catches[0].catchId;
+  displayCatchSummary(firstCatchId);
+
   setStatus("Ready.");
+}
+
+function displayCatchSummary(catchId) {
+  if (!catchId) {
+    el.catchSummary.classList.remove('visible');
+    el.catchSummary.textContent = '';
+    return;
+  }
+
+  const catchData = catchesData[catchId];
+  if (catchData && catchData.fullSummary) {
+    el.catchSummary.textContent = catchData.fullSummary;
+    el.catchSummary.classList.add('visible');
+  } else {
+    el.catchSummary.classList.remove('visible');
+  }
 }
 
 // tiny helper so weird characters don't break the HTML
@@ -154,5 +183,10 @@ window.addEventListener("DOMContentLoaded", () => {
     setStatus("Failed to load catches ❌");
     el.catchId.innerHTML = `<option value="">Failed to load</option>`;
     log(String(err));
+  });
+
+  // Show summary when user selects a catch
+  el.catchId.addEventListener('change', (e) => {
+    displayCatchSummary(e.target.value);
   });
 });

@@ -40,9 +40,9 @@ body {
 }
 
 .primary-button {
-  display: inline-block;
+  display: block;
   width: 100%;
-  padding: 16px 12px;
+  padding: 24px;
   margin-bottom: 32px;
   font-size: 18px;
   font-weight: 600;
