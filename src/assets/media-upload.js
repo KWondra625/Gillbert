@@ -1,4 +1,4 @@
-const ENV = "dev"; // dev | prod
+const ENV = window.location.hostname.includes("gillbert.kwtechhub.net") ? "prod" : "dev";
 
 const N8N_BASE_URL =
   ENV === "prod"
@@ -7,6 +7,7 @@ const N8N_BASE_URL =
 
 const SAS_WEBHOOK_URL = N8N_BASE_URL + "/webhook/uploads/sas";
 const COMMIT_WEBHOOK_URL = N8N_BASE_URL + "/webhook/uploads/commit";
+const CATCHES_GET_URL = N8N_BASE_URL + "/webhook/catches";
 
 const el = {
   catchId: document.getElementById('catchId'),
@@ -97,6 +98,7 @@ el.uploadBtn.addEventListener('click', async () => {
     await postUploadMetadata(catchId, uploads);
 
     setStatus("Done ✅");
+    el.files.value = ""; //Clear the files collection now that the upload has been successful.
     log("\nRead URLs:");
     uploads.forEach(u => log(u.readUrl));
 
@@ -108,8 +110,6 @@ el.uploadBtn.addEventListener('click', async () => {
     el.uploadBtn.disabled = false;
   }
 });
-
-const CATCHES_GET_URL = N8N_BASE_URL + "/webhook/catches";
 
 async function loadCatchesIntoDropdown() {
   setStatus("Loading catches...");

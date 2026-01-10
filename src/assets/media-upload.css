@@ -11,6 +11,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
 .container {
@@ -20,6 +22,7 @@ body {
   border-radius: 16px;
   padding: 32px 24px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  margin: auto;
 }
 
 .header {
@@ -134,8 +137,9 @@ input[type="file"]::file-selector-button {
   border-radius: 8px;
   font-size: 12px;
   font-family: "Courier New", monospace;
-  color: #333;
-  max-height: 300px;
+  color: #333;200px;
   overflow-y: auto;
+  border-left: 4px solid #4FACFE;
+  margin-bottom: 16px
   border-left: 4px solid #4FACFE;
 }
