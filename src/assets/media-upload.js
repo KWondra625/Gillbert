@@ -3,6 +3,7 @@ const hostname = window.location.hostname;
 const ENV = (hostname === "gillbert.kwtechhub.net") ? "prod" : "dev";
 const N8N_BASE_URL = "https://api.kwtechhub.net";
 const WEBHOOK_PATH = ENV === "prod" ? "/webhook/" : "/webhook-test/";
+const API_KEY = 'sj30z42c9e0nIzchc5u';
 
 const SAS_WEBHOOK_URL = N8N_BASE_URL + WEBHOOK_PATH + "uploads/sas";
 const COMMIT_WEBHOOK_URL = N8N_BASE_URL + WEBHOOK_PATH + "uploads/commit";
@@ -31,7 +32,7 @@ function log(msg) {
 async function getSasUrls(catchId, files) {
   const res = await fetch(SAS_WEBHOOK_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "X-API-Key": API_KEY, "Content-Type": "application/json" },
     body: JSON.stringify({
       catchId,
       files: files.map(f => ({ name: f.name, size: f.size, type: f.type })),
@@ -60,7 +61,7 @@ async function postUploadMetadata(catchId, uploads) {
 
   const res = await fetch(COMMIT_WEBHOOK_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "X-API-Key": API_KEY, "Content-Type": "application/json" },
     body: JSON.stringify({ catchId, uploads }),
   });
 
@@ -118,7 +119,10 @@ async function loadCatchesIntoDropdown() {
   setStatus("Loading catches...");
   el.catchId.innerHTML = `<option value="">Loading…</option>`;
 
-  const res = await fetch(CATCHES_GET_URL);
+  const res = await fetch(CATCHES_GET_URL, {
+    headers: { "X-API-Key": API_KEY },
+  });
+
   if (!res.ok) throw new Error(`GET failed: ${res.status}`);
 
   const data = await res.json();
