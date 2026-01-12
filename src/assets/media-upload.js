@@ -1,13 +1,13 @@
-const ENV = window.location.hostname.includes("gillbert.kwtechhub.net") ? "prod" : "dev";
+const hostname = window.location.hostname;
+// Use test webhooks when on preview/dev URLs, production webhooks on main site
+const ENV = (hostname === "gillbert.kwtechhub.net") ? "prod" : "dev";
+const N8N_BASE_URL = "https://api.kwtechhub.net";
+const WEBHOOK_PATH = ENV === "prod" ? "/webhook/" : "/webhook-test/";
 
-const N8N_BASE_URL =
-  ENV === "prod"
-    ? "https://n8n.kwtechhub.net"
-    : "https://n8n-dev.kwtechhub.net";
+const SAS_WEBHOOK_URL = N8N_BASE_URL + WEBHOOK_PATH + "uploads/sas";
+const COMMIT_WEBHOOK_URL = N8N_BASE_URL + WEBHOOK_PATH + "uploads/commit";
+const CATCHES_GET_URL = N8N_BASE_URL + WEBHOOK_PATH + "catches";
 
-const SAS_WEBHOOK_URL = N8N_BASE_URL + "/webhook/uploads/sas";
-const COMMIT_WEBHOOK_URL = N8N_BASE_URL + "/webhook/uploads/commit";
-const CATCHES_GET_URL = N8N_BASE_URL + "/webhook/catches";
 
 const el = {
   catchId: document.getElementById('catchId'),
