@@ -17,6 +17,7 @@ const el = {
   status: document.getElementById('status'),
   log: document.getElementById('log'),
   catchSummary: document.getElementById('catchSummary'),
+  loadingIndicator: document.getElementById('loadingIndicator'),
 };
 
 let catchesData = {}; // Store catch data for lookups
@@ -57,8 +58,6 @@ async function uploadOne(uploadUrl, file) {
 }
 
 async function postUploadMetadata(catchId, uploads) {
-  log(`\nSaving uploaded media details to AirTable`);
-
   const res = await fetch(COMMIT_WEBHOOK_URL, {
     method: "POST",
     headers: { "X-API-Key": API_KEY, "Content-Type": "application/json" },
@@ -86,6 +85,7 @@ el.uploadBtn.addEventListener('click', async () => {
 
   try {
     el.uploadBtn.disabled = true;
+    el.loadingIndicator.classList.add('visible');
     setStatus("Requesting upload URLs...");
     log(`Catch: ${catchId}`);
     log(`Files: ${files.length}`);
@@ -94,17 +94,18 @@ el.uploadBtn.addEventListener('click', async () => {
 
     setStatus("Uploading to Azure...");
     for (let i = 0; i < uploads.length; i++) {
-      log(`Uploading ${i + 1}/${uploads.length}: ${uploads[i].originalName || files[i].name}`);
+      log(`Uploading ${i + 1}/${uploads.length}: ${uploads[i].originalName || files[i].name}...`);
       await uploadOne(uploads[i].uploadUrl, files[i]);
+      log(`✅ Finished uploading ${i + 1}/${uploads.length}: ${uploads[i].originalName || files[i].name}`);
     }
 
+    log(`\nSaving uploaded media details to AirTable...`);
     setStatus("Saving metadata to AirTable...");
     await postUploadMetadata(catchId, uploads);
+    log(`✅ Saved to AirTable`);
 
     setStatus("Done ✅");
     el.files.value = ""; //Clear the files collection now that the upload has been successful.
-    log("\nRead URLs:");
-    uploads.forEach(u => log(u.readUrl));
 
   } catch (err) {
     console.error(err);
@@ -112,6 +113,7 @@ el.uploadBtn.addEventListener('click', async () => {
     log(String(err));
   } finally {
     el.uploadBtn.disabled = false;
+    el.loadingIndicator.classList.remove('visible');
   }
 });
 
