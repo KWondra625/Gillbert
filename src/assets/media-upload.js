@@ -99,6 +99,8 @@ async function getSasUrls(catchId, files) {
 }
 
 async function uploadOne(uploadUrl, file) {
+  console.log('Azure PUT URL:', uploadUrl);
+  console.log('File type:', file.type, 'File size:', file.size);
   const res = await fetch(uploadUrl, {
     method: "PUT",
     headers: {
