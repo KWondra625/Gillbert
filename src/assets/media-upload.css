@@ -194,6 +194,29 @@ input[type="file"]::file-selector-button {
   display: none;
 }
 
+.log--collapsed {
+  display: none;
+}
+
+.log-toggle {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  background: none;
+  border: 1px dashed #cce4ff;
+  border-radius: 8px;
+  color: #4FACFE;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.log-toggle:hover {
+  background: #f0f8ff;
+}
+
 /* Utility */
 .hidden {
   display: none !important;

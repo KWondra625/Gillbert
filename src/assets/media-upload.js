@@ -17,6 +17,7 @@ const el = {
   backToCatch:      document.getElementById('backToCatch'),
   successBackBtn:   document.getElementById('successBackBtn'),
   countdown:        document.getElementById('countdown'),
+  logToggle:        document.getElementById('logToggle'),
 };
 
 function getCatchIdFromUrl() {
@@ -130,16 +131,36 @@ function startSuccessCountdown(catchId) {
   el.successBackBtn.href = detailsUrl;
 
   let remaining = REDIRECT_DELAY;
+  let timer = null;
+  let paused = false;
+
   el.countdown.textContent = remaining;
 
-  const timer = setInterval(() => {
-    remaining--;
-    el.countdown.textContent = remaining;
-    if (remaining <= 0) {
+  function startTimer() {
+    timer = setInterval(() => {
+      remaining--;
+      el.countdown.textContent = remaining;
+      if (remaining <= 0) {
+        clearInterval(timer);
+        window.location.href = detailsUrl;
+      }
+    }, 1000);
+  }
+
+  startTimer();
+
+  el.logToggle.addEventListener('click', () => {
+    paused = !paused;
+    if (paused) {
       clearInterval(timer);
-      window.location.href = detailsUrl;
+      el.log.classList.remove('log--collapsed');
+      el.logToggle.textContent = '📋 Hide upload log (countdown paused)';
+    } else {
+      el.log.classList.add('log--collapsed');
+      el.logToggle.textContent = '📋 View upload log';
+      startTimer();
     }
-  }, 1000);
+  });
 }
 
 // --- Upload Button ------------------------------------------------------------
@@ -154,6 +175,7 @@ el.uploadBtn.addEventListener('click', async () => {
   try {
     el.uploadBtn.disabled = true;
     el.loadingIndicator.classList.add('visible');
+    el.log.classList.remove('log--collapsed'); // show log during upload
     setStatus("Requesting upload slots...");
     log(`Catch: ${catchId}`);
     log(`Files: ${files.length}`);
@@ -176,6 +198,7 @@ el.uploadBtn.addEventListener('click', async () => {
     el.loadingIndicator.classList.remove('visible');
     setStatus("");
 
+    el.log.classList.add('log--collapsed'); // collapse log, toggleable from success state
     el.uploadState.classList.add('hidden');
     el.successState.classList.remove('hidden');
     startSuccessCountdown(catchId);
