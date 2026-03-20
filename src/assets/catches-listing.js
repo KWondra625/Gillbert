@@ -1,11 +1,8 @@
-const hostname = window.location.hostname;
-// Use test webhooks when on preview/dev URLs, production webhooks on main site
-const ENV = (hostname === "gillbert.builtbykw.net") ? "prod" : "dev";
 const N8N_BASE_URL = "https://api.builtbykw.net";
-const WEBHOOK_PATH = ENV === "prod" ? "/webhook/" : "/webhook-test/";
+const WEBHOOK_PATH = "/webhook/";
 const API_KEY = 'sj30z42c9e0nIzchc5u';
 
-const CATCHES_GET_URL = N8N_BASE_URL + WEBHOOK_PATH + "catches";
+const CATCHES_GET_URL = N8N_BASE_URL + WEBHOOK_PATH + "gillbert/get-catches";
 const ITEMS_PER_PAGE = 25;
 
 const el = {
@@ -16,6 +13,8 @@ const el = {
   nextBtn: document.getElementById('nextBtn'),
   pageInfo: document.getElementById('pageInfo'),
   paginationContainer: document.getElementById('paginationContainer'),
+  searchInput: document.getElementById('searchInput'),
+  searchBtn: document.getElementById('searchBtn'),
 };
 
 let allCatches = [];
@@ -48,7 +47,12 @@ async function loadCatches() {
     showLoading();
     setStatus("Loading catches...");
 
-    const res = await fetch(CATCHES_GET_URL, {
+    const term = el.searchInput.value.trim();
+    const url = term
+      ? `${CATCHES_GET_URL}?search=${encodeURIComponent(term)}`
+      : CATCHES_GET_URL;
+
+    const res = await fetch(url, {
       headers: { "X-API-Key": API_KEY },
     });
 
@@ -155,6 +159,25 @@ el.prevBtn.addEventListener("click", () => {
 el.nextBtn.addEventListener("click", () => {
   currentPage++;
   renderPage();
+});
+
+el.searchBtn.addEventListener("click", () => {
+  currentPage = 1;
+  loadCatches();
+});
+
+el.searchInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    currentPage = 1;
+    loadCatches();
+  }
+});
+
+el.searchInput.addEventListener("input", () => {
+  if (el.searchInput.value.trim() === "") {
+    currentPage = 1;
+    loadCatches();
+  }
 });
 
 window.addEventListener("DOMContentLoaded", () => {

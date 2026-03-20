@@ -1,9 +1,8 @@
 DROP SCHEMA IF EXISTS airtable_backup CASCADE;
-DROP SCHEMA IF EXISTS gillbert_airtable_backup CASCADE;
 
-CREATE SCHEMA IF NOT EXISTS gillbert_airtable_backup;
+CREATE SCHEMA IF NOT EXISTS airtable_backup;
 
-CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.anglers (
+CREATE TABLE IF NOT EXISTS airtable_backup.anglers (
     id SERIAL PRIMARY KEY,
     name varchar(255) NOT NULL,
     status varchar(255) NOT NULL, 
@@ -15,7 +14,7 @@ CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.anglers (
     postgres_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.bodies_of_water (
+CREATE TABLE IF NOT EXISTS airtable_backup.bodies_of_water (
     id SERIAL PRIMARY KEY,
     name varchar(255) NOT NULL,
     status varchar(255) NOT NULL,
@@ -28,7 +27,7 @@ CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.bodies_of_water (
     postgres_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.fish_species (
+CREATE TABLE IF NOT EXISTS airtable_backup.fish_species (
     id SERIAL PRIMARY KEY,
     name varchar(255) NOT NULL,
     status varchar(255) NOT NULL, 
@@ -41,7 +40,7 @@ CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.fish_species (
     postgres_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.conversations (
+CREATE TABLE IF NOT EXISTS airtable_backup.conversations (
     id SERIAL PRIMARY KEY,
     conversation_id varchar(255) NOT NULL,
     channel varchar(255) NOT NULL,
@@ -69,7 +68,7 @@ CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.conversations (
     postgres_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.catches (
+CREATE TABLE IF NOT EXISTS airtable_backup.catches (
     id SERIAL PRIMARY KEY,
     catch_id varchar(255) NOT NULL,
     status varchar(255) NOT NULL,
@@ -97,7 +96,7 @@ CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.catches (
     postgres_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.catches_testing (
+CREATE TABLE IF NOT EXISTS airtable_backup.catches_testing (
     id SERIAL PRIMARY KEY,
     catch_id varchar(255) NOT NULL,
     status varchar(255) NOT NULL,
@@ -125,7 +124,7 @@ CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.catches_testing (
     postgres_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.catches_backup_20251123 (
+CREATE TABLE IF NOT EXISTS airtable_backup.catches_backup_20251123 (
     id SERIAL PRIMARY KEY,
     catch_id varchar(255) NOT NULL,
     status varchar(255) NOT NULL,
@@ -153,7 +152,7 @@ CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.catches_backup_20251123 (
     postgres_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.catches_backup_afterExcelLoad_20251123 (
+CREATE TABLE IF NOT EXISTS airtable_backup.catches_backup_afterExcelLoad_20251123 (
     id SERIAL PRIMARY KEY,
     catch_id varchar(255) NOT NULL,
     status varchar(255) NOT NULL,
@@ -181,7 +180,7 @@ CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.catches_backup_afterExcelLoa
     postgres_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS gillbert_airtable_backup.catch_media (
+CREATE TABLE IF NOT EXISTS airtable_backup.catch_media (
     id SERIAL PRIMARY KEY,
     media_id varchar(255) NOT NULL,
     airtable_catch_id varchar(255) NOT NULL,
