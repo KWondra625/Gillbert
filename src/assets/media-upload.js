@@ -1,5 +1,5 @@
-﻿const SAS_WEBHOOK_URL    = N8N_BASE_URL + WEBHOOK_PATH + "uploads/sas";
-const COMMIT_WEBHOOK_URL = N8N_BASE_URL + WEBHOOK_PATH + "uploads/commit";
+﻿const SAS_WEBHOOK_URL    = N8N_BASE_URL + WEBHOOK_PATH + "gillbert/upload-media/get-sas";
+const COMMIT_WEBHOOK_URL = N8N_BASE_URL + WEBHOOK_PATH + "gillbert/upload-media/commit";
 
 const REDIRECT_DELAY = 20; // seconds
 
