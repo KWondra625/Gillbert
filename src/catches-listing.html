@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gillbert - Catch Listing</title>
+  <link rel="stylesheet" href="./assets/catches-listing.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎣 All Catches</h1>
+      <p>Browse your catch records</p>
+    </div>
+
+    <div class="controls">
+      <div id="status" class="status"></div>
+      <div id="loadingIndicator" class="loading-indicator">
+        <div class="fishing-animation">
+          🎣<span class="bobber">●</span>
+        </div>
+        <p>Loading your catches...</p>
+      </div>
+    </div>
+
+    <div id="catchesContainer" class="catches-grid">
+      <!-- Cards will be inserted here -->
+    </div>
+
+    <div id="paginationContainer" class="pagination-container">
+      <button id="prevBtn" class="pagination-button">← Previous</button>
+      <span id="pageInfo" class="page-info"></span>
+      <button id="nextBtn" class="pagination-button">Next →</button>
+    </div>
+
+    <div class="nav-buttons">
+      <a href="./index.html" class="secondary-button">← Back to Home</a>
+      <a href="./media-upload.html" class="secondary-button">⬆️ Upload Media</a>
+    </div>
+  </div>
+
+  <script src="./assets/catches-listing.js"></script>
+</body>
+</html>
