@@ -262,24 +262,19 @@ window.addEventListener("DOMContentLoaded", () => {
 // ─── Media ───────────────────────────────────────────────────────
 
 async function loadCatchMedia(catchId) {
+  let items = [];
   try {
     const url = `${CATCH_MEDIA_GET_URL}?catchId=${encodeURIComponent(catchId)}`;
     const res = await fetch(url, { headers: { "X-API-Key": API_KEY } });
     if (!res.ok) throw new Error(`Media GET failed: ${res.status}`);
     const data = await res.json();
-    const items = Array.isArray(data) ? data : (data.media || []);
-    renderMedia(items);
+    items = Array.isArray(data) ? data
+          : Array.isArray(data.media) ? data.media
+          : [];
   } catch (err) {
     console.error('Media load error:', err);
-    const mc = document.getElementById('mediaContainer');
-    if (mc) mc.innerHTML = `
-      <div class="detail-section-label">Catch Media</div>
-      <div class="media-content">
-        <div class="detail-media-empty">
-          <span class="detail-media-empty-icon">📷</span>
-          <p class="detail-media-empty-text">No photos or videos yet for this catch.</p>
-        </div>
-      </div>`;
+  } finally {
+    renderMedia(items);
   }
 }
 
@@ -355,7 +350,10 @@ function renderMedia(items) {
   const catchId = getCatchIdFromUrl();
   const uploadBtn = `<a href="./media-upload.html?catchId=${encodeURIComponent(catchId)}" class="detail-upload-btn">⬆️ Upload Media</a>`;
 
-  if (!items.length) {
+  const photos = items.filter(m => m.mediaType === 'Photo');
+  const videos = items.filter(m => m.mediaType === 'Video');
+
+  if (!photos.length && !videos.length) {
     container.innerHTML = `
       <div class="detail-section-label">Catch Media</div>
       <div class="media-content">
@@ -367,9 +365,6 @@ function renderMedia(items) {
       </div>`;
     return;
   }
-
-  const photos = items.filter(m => m.mediaType === 'Photo');
-  const videos = items.filter(m => m.mediaType === 'Video');
 
   let html = '<div class="detail-section-label">Catch Media</div><div class="media-content">';
 
