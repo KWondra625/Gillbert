@@ -3,6 +3,7 @@ const WEBHOOK_PATH = "/webhook/";
 const API_KEY = 'sj30z42c9e0nIzchc5u';
 
 const CATCHES_GET_URL = N8N_BASE_URL + WEBHOOK_PATH + "gillbert/get-catches";
+const CATCH_MEDIA_GET_URL = N8N_BASE_URL + WEBHOOK_PATH + "gillbert/get-catch-media";
 
 // Primary fields shown in this exact order
 const FIELD_ORDER = [
@@ -48,8 +49,9 @@ const el = {
   status:           document.getElementById('status'),
   loadingIndicator: document.getElementById('loadingIndicator'),
   detailsContainer: document.getElementById('detailsContainer'),
-  catchIdDisplay:   document.getElementById('catchIdDisplay'),
-  uploadMediaBtn:   document.getElementById('uploadMediaBtn'),
+  lightbox:         document.getElementById('lightbox'),
+  lightboxImg:      document.getElementById('lightboxImg'),
+  lightboxClose:    document.getElementById('lightboxClose'),
 };
 
 function setStatus(msg, isError = false) {
@@ -90,6 +92,7 @@ function formatDateTime(value) {
 function formatValue(key, value) {
   if (DATETIME_FIELDS.has(key)) return formatDateTime(value);
   if (key === 'length') return `${escapeHtml(String(value))}"`;
+  if (key === 'waterDepth') return `${escapeHtml(String(value))}'`;
   return escapeHtml(String(value));
 }
 
@@ -159,8 +162,7 @@ async function loadCatchDetails(catchId) {
 function renderDetails(catchData) {
   const catchId = catchData.catchId || "Unknown";
 
-  el.catchIdDisplay.textContent = catchId;
-  el.uploadMediaBtn.href = `./media-upload.html?catchId=${encodeURIComponent(catchId)}`;
+  document.title = `${catchId} · Gillbert`;
 
   const hasValue = (key) => catchData[key] !== null && catchData[key] !== undefined && catchData[key] !== '';
 
@@ -183,30 +185,40 @@ function renderDetails(catchData) {
     .map(key => buildRow(key, catchData[key]))
     .join('');
 
-  // 3. Audit section
+  // 3. Audit data — stored for the modal, not rendered inline
   const auditRows = AUDIT_FIELDS
     .filter(hasValue)
     .map(key => buildRow(key, catchData[key], 'detail-row--audit'))
     .join('');
 
-  const auditHtml = auditRows ? `
-    <div class="detail-audit-section">
-      <div class="detail-audit-label">Record Info</div>
-      ${auditRows}
-    </div>` : '';
+  // Populate the record info modal content
+  const recordInfoModal = document.getElementById('recordInfoModal');
+  const recordInfoBody  = document.getElementById('recordInfoBody');
+  if (recordInfoBody) recordInfoBody.innerHTML = auditRows || '<p style="color:#aaa">No record info available.</p>';
 
   el.detailsContainer.innerHTML = `
     <div class="detail-card">
       <div class="detail-card-header">
-        <h2>${escapeHtml(catchId)}</h2>
+        <h2>${escapeHtml(catchId)} 🎣</h2>
       </div>
+      <div class="detail-card-section-label">Catch Details</div>
       <div class="detail-card-body">
         ${headlineHtml}
         ${primaryRows}
         ${extraRows}
       </div>
-      ${auditHtml}
+      <div id="mediaContainer" class="detail-media-section">
+        <div class="detail-section-label">Catch Media</div>
+        <div class="media-content"><p class="detail-media-loading">Loading media...</p></div>
+      </div>
+      <div class="detail-card-footer">
+        <button class="record-info-trigger" id="recordInfoTrigger">ⓘ Record Info</button>
+      </div>
     </div>`;
+
+  document.getElementById('recordInfoTrigger').addEventListener('click', () => {
+    recordInfoModal.classList.add('open');
+  });
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -223,5 +235,187 @@ window.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  loadCatchDetails(catchId);
+  // Render catch details first (card must exist for media container), then fetch media
+  loadCatchDetails(catchId).then(() => loadCatchMedia(catchId));
+
+  // Lightbox close handlers
+  el.lightboxClose.addEventListener('click', closeLightbox);
+  el.lightbox.addEventListener('click', (e) => {
+    if (e.target === el.lightbox) closeLightbox();
+  });
+
+  const recordInfoModal = document.getElementById('recordInfoModal');
+  const recordInfoClose = document.getElementById('recordInfoClose');
+  recordInfoClose.addEventListener('click', () => recordInfoModal.classList.remove('open'));
+  recordInfoModal.addEventListener('click', (e) => {
+    if (e.target === recordInfoModal) recordInfoModal.classList.remove('open');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeLightbox();
+      recordInfoModal.classList.remove('open');
+    }
+  });
 });
+
+// ─── Media ───────────────────────────────────────────────────────
+
+async function loadCatchMedia(catchId) {
+  try {
+    const url = `${CATCH_MEDIA_GET_URL}?catchId=${encodeURIComponent(catchId)}`;
+    const res = await fetch(url, { headers: { "X-API-Key": API_KEY } });
+    if (!res.ok) throw new Error(`Media GET failed: ${res.status}`);
+    const data = await res.json();
+    const items = Array.isArray(data) ? data : (data.media || []);
+    renderMedia(items);
+  } catch (err) {
+    console.error('Media load error:', err);
+    el.mediaContainer.innerHTML = '';
+  }
+}
+
+function formatUploadedAt(value) {
+  if (!value) return '';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+function buildMediaTile(item) {
+  const { readUrl, mediaType, contentType, uploadedAt } = item;
+  const caption = uploadedAt
+    ? `<div class="media-tile-caption">${escapeHtml(formatUploadedAt(uploadedAt))}</div>`
+    : '';
+
+  // HEIC — browsers can't render inline; show download placeholder
+  if (contentType === 'image/heic') {
+    return `
+      <div class="media-tile">
+        <div class="media-tile-placeholder">
+          <div class="media-placeholder-icon">📷</div>
+          <div class="media-placeholder-label">HEIC Photo</div>
+          <a class="media-placeholder-link" href="${encodeURI(readUrl)}" target="_blank" rel="noopener">Open / Download</a>
+        </div>
+        ${caption}
+      </div>`;
+  }
+
+  // Video
+  if (mediaType === 'Video') {
+    return `
+      <div class="media-tile media-tile--video">
+        <video preload="metadata" playsinline>
+          <source src="${encodeURI(readUrl)}" type="${escapeHtml(contentType)}">
+        </video>
+        <div class="media-play-overlay">
+          <div class="media-play-btn"></div>
+          <div class="media-video-label">Video</div>
+        </div>
+        ${caption}
+      </div>`;
+  }
+
+  // Photo (jpeg, png, etc.)
+  return `
+    <div class="media-tile media-tile--photo" data-url="${encodeURI(readUrl)}">
+      <img
+        src="${encodeURI(readUrl)}"
+        alt="Catch photo"
+        loading="lazy"
+        onerror="this.closest('.media-tile').replaceWith(brokenTile())"
+      />
+      ${caption}
+    </div>`;
+}
+
+function brokenTile() {
+  const div = document.createElement('div');
+  div.className = 'media-tile media-tile-broken';
+  div.innerHTML = `
+    <div class="media-tile-placeholder">
+      <div class="media-placeholder-icon" style="opacity:0.4">🖼️</div>
+      <div class="media-placeholder-label" style="opacity:0.5">Media unavailable</div>
+    </div>`;
+  return div;
+}
+
+function renderMedia(items) {
+  const container = document.getElementById('mediaContainer');
+  if (!container) return;
+
+  const catchId = getCatchIdFromUrl();
+  const uploadBtn = `<a href="./media-upload.html?catchId=${encodeURIComponent(catchId)}" class="detail-upload-btn">⬆️ Upload Media</a>`;
+
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="detail-section-label">Catch Media</div>
+      <div class="media-content">
+        <p class="detail-media-empty">No media uploaded yet.</p>
+        ${uploadBtn}
+      </div>`;
+    return;
+  }
+
+  const photos = items.filter(m => m.mediaType === 'Photo');
+  const videos = items.filter(m => m.mediaType === 'Video');
+
+  let html = '<div class="detail-section-label">Catch Media</div><div class="media-content">';
+
+  if (photos.length) {
+    html += `
+      <div class="media-section">
+        <h3 class="media-section-title">📸 Photos (${photos.length})</h3>
+        <div class="media-grid">${photos.map(buildMediaTile).join('')}</div>
+      </div>`;
+  }
+
+  if (videos.length) {
+    html += `
+      <div class="media-section">
+        <h3 class="media-section-title">🎬 Videos (${videos.length})</h3>
+        <div class="media-grid">${videos.map(buildMediaTile).join('')}</div>
+      </div>`;
+  }
+
+  html += uploadBtn;
+  html += '</div>';
+  container.innerHTML = html;
+
+  // Wire up photo lightbox clicks
+  container.querySelectorAll('.media-tile--photo').forEach(tile => {
+    tile.addEventListener('click', () => openLightbox(tile.dataset.url));
+  });
+
+  // Wire up video play overlay clicks
+  container.querySelectorAll('.media-tile--video').forEach(tile => {
+    const overlay = tile.querySelector('.media-play-overlay');
+    const video   = tile.querySelector('video');
+    overlay.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      video.controls = true;
+      video.play();
+    });
+    // Re-show overlay when video ends or is paused externally
+    video.addEventListener('pause', () => {
+      if (video.ended || video.paused) {
+        overlay.style.display = '';
+        video.controls = false;
+      }
+    });
+  });
+}
+
+// ─── Lightbox ────────────────────────────────────────────────────
+
+function openLightbox(url) {
+  el.lightboxImg.src = url;
+  el.lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  el.lightbox.classList.remove('open');
+  el.lightboxImg.src = '';
+  document.body.style.overflow = '';
+}
