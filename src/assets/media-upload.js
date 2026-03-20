@@ -17,7 +17,6 @@ const el = {
   backToCatch:      document.getElementById('backToCatch'),
   successBackBtn:   document.getElementById('successBackBtn'),
   countdown:        document.getElementById('countdown'),
-  pauseBtn:         document.getElementById('pauseBtn'),
 };
 
 function getCatchIdFromUrl() {
@@ -131,36 +130,16 @@ function startSuccessCountdown(catchId) {
   el.successBackBtn.href = detailsUrl;
 
   let remaining = REDIRECT_DELAY;
-  let timer = null;
-  let paused = false;
-
   el.countdown.textContent = remaining;
 
-  function startTimer() {
-    timer = setInterval(() => {
-      remaining--;
-      el.countdown.textContent = remaining;
-      if (remaining <= 0) {
-        clearInterval(timer);
-        window.location.href = detailsUrl;
-      }
-    }, 1000);
-  }
-
-  startTimer();
-
-  el.pauseBtn.addEventListener('click', () => {
-    paused = !paused;
-    if (paused) {
+  const timer = setInterval(() => {
+    remaining--;
+    el.countdown.textContent = remaining;
+    if (remaining <= 0) {
       clearInterval(timer);
-      el.pauseBtn.textContent = '▶️';
-      el.pauseBtn.title = 'Resume countdown';
-    } else {
-      el.pauseBtn.textContent = '⏸';
-      el.pauseBtn.title = 'Pause countdown';
-      startTimer();
+      window.location.href = detailsUrl;
     }
-  });
+  }, 1000);
 }
 
 // --- Upload Button ------------------------------------------------------------
