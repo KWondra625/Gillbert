@@ -271,7 +271,15 @@ async function loadCatchMedia(catchId) {
     renderMedia(items);
   } catch (err) {
     console.error('Media load error:', err);
-    el.mediaContainer.innerHTML = '';
+    const mc = document.getElementById('mediaContainer');
+    if (mc) mc.innerHTML = `
+      <div class="detail-section-label">Catch Media</div>
+      <div class="media-content">
+        <div class="detail-media-empty">
+          <span class="detail-media-empty-icon">📷</span>
+          <p class="detail-media-empty-text">No photos or videos yet for this catch.</p>
+        </div>
+      </div>`;
   }
 }
 
@@ -351,7 +359,10 @@ function renderMedia(items) {
     container.innerHTML = `
       <div class="detail-section-label">Catch Media</div>
       <div class="media-content">
-        <p class="detail-media-empty">No media uploaded yet.</p>
+        <div class="detail-media-empty">
+          <span class="detail-media-empty-icon">📷</span>
+          <p class="detail-media-empty-text">No photos or videos yet for this catch.</p>
+        </div>
         ${uploadBtn}
       </div>`;
     return;

@@ -118,8 +118,15 @@ function renderCatchCard(catchData) {
     anglerName = "Unknown",
     fishSpeciesName = "Unknown",
     length = "N/A",
-    fullSummary = "No summary available",
+    caughtWhen = null,
   } = catchData;
+
+  const caughtWhenDisplay = caughtWhen
+    ? new Date(caughtWhen).toLocaleString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit', hour12: true,
+      })
+    : 'Unknown';
 
   return `
     <div class="catch-card">
@@ -128,19 +135,20 @@ function renderCatchCard(catchData) {
       </div>
       <div class="catch-card-body">
         <div class="catch-field">
-          <span class="field-label">🎣 Species:</span>
-          <span class="field-value">${escapeHtml(fishSpeciesName)}</span>
-        </div>
-        <div class="catch-field">
-          <span class="field-label">👤 Caught By:</span>
+          <span class="field-label">👤 Angler:</span>
           <span class="field-value">${escapeHtml(anglerName)}</span>
         </div>
         <div class="catch-field">
-          <span class="field-label">📏 Length:</span>
-          <span class="field-value">${escapeHtml(length)}</span>
+          <span class="field-label">🐟 Species:</span>
+          <span class="field-value">${escapeHtml(fishSpeciesName)}</span>
         </div>
-        <div class="catch-summary">
-          <p>${escapeHtml(fullSummary)}</p>
+        <div class="catch-field">
+          <span class="field-label">📏 Length:</span>
+          <span class="field-value">${escapeHtml(String(length))}"</span>
+        </div>
+        <div class="catch-field">
+          <span class="field-label">📅 When:</span>
+          <span class="field-value">${escapeHtml(caughtWhenDisplay)}</span>
         </div>
       </div>
       <div class="catch-card-footer">
