@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gillbert - Catch Details</title>
+  <link rel="stylesheet" href="./assets/catch-details.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎣 Catch Details</h1>
+      <p id="catchIdDisplay" class="catch-id-display"></p>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div id="loadingIndicator" class="loading-indicator">
+      <div class="fishing-animation">
+        🎣<span class="bobber">●</span>
+      </div>
+      <p>Loading catch details...</p>
+    </div>
+
+    <div id="detailsContainer"></div>
+
+    <div class="nav-buttons">
+      <a href="./catches-listing.html" class="secondary-button">← Back to Listing</a>
+      <a id="uploadMediaBtn" href="#" class="secondary-button">⬆️ Upload Media</a>
+    </div>
+  </div>
+
+  <script src="./assets/catch-details.js"></script>
+</body>
+</html>

@@ -73,6 +73,7 @@ async function loadCatches() {
 
     setStatus("");
     currentPage = 1;
+    sessionStorage.setItem('gillbert_search', el.searchInput.value.trim());
     renderPage();
     hideLoading();
   } catch (err) {
@@ -143,8 +144,8 @@ function renderCatchCard(catchData) {
         </div>
       </div>
       <div class="catch-card-footer">
-        <a href="./media-upload.html?catchId=${encodeURIComponent(catchId)}" class="card-button">
-          ⬆️ Upload Media
+        <a href="./catch-details.html?catchId=${encodeURIComponent(catchId)}" class="card-button">
+          🔍 View Details
         </a>
       </div>
     </div>
@@ -181,5 +182,9 @@ el.searchInput.addEventListener("input", () => {
 });
 
 window.addEventListener("DOMContentLoaded", () => {
+  const savedSearch = sessionStorage.getItem('gillbert_search');
+  if (savedSearch) {
+    el.searchInput.value = savedSearch;
+  }
   loadCatches();
 });
