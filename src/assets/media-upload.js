@@ -17,7 +17,7 @@ const el = {
   backToCatch:      document.getElementById('backToCatch'),
   successBackBtn:   document.getElementById('successBackBtn'),
   countdown:        document.getElementById('countdown'),
-  logToggle:        document.getElementById('logToggle'),
+  pauseBtn:         document.getElementById('pauseBtn'),
 };
 
 function getCatchIdFromUrl() {
@@ -149,15 +149,15 @@ function startSuccessCountdown(catchId) {
 
   startTimer();
 
-  el.logToggle.addEventListener('click', () => {
+  el.pauseBtn.addEventListener('click', () => {
     paused = !paused;
     if (paused) {
       clearInterval(timer);
-      el.log.classList.remove('log--collapsed');
-      el.logToggle.textContent = '📋 Hide upload log (countdown paused)';
+      el.pauseBtn.textContent = '▶️';
+      el.pauseBtn.title = 'Resume countdown';
     } else {
-      el.log.classList.add('log--collapsed');
-      el.logToggle.textContent = '📋 View upload log';
+      el.pauseBtn.textContent = '⏸';
+      el.pauseBtn.title = 'Pause countdown';
       startTimer();
     }
   });
@@ -175,7 +175,6 @@ el.uploadBtn.addEventListener('click', async () => {
   try {
     el.uploadBtn.disabled = true;
     el.loadingIndicator.classList.add('visible');
-    el.log.classList.remove('log--collapsed'); // show log during upload
     setStatus("Requesting upload slots...");
     log(`Catch: ${catchId}`);
     log(`Files: ${files.length}`);
@@ -198,7 +197,6 @@ el.uploadBtn.addEventListener('click', async () => {
     el.loadingIndicator.classList.remove('visible');
     setStatus("");
 
-    el.log.classList.add('log--collapsed'); // collapse log, toggleable from success state
     el.uploadState.classList.add('hidden');
     el.successState.classList.remove('hidden');
     startSuccessCountdown(catchId);
