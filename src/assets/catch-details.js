@@ -1,9 +1,4 @@
-const N8N_BASE_URL = "https://api.builtbykw.net";
-const WEBHOOK_PATH = "/webhook/";
-const API_KEY = 'sj30z42c9e0nIzchc5u';
-
-const CATCHES_GET_URL = N8N_BASE_URL + WEBHOOK_PATH + "gillbert/get-catches";
-const CATCH_MEDIA_GET_URL = N8N_BASE_URL + WEBHOOK_PATH + "gillbert/get-catch-media";
+const CATCH_MEDIA_GET_URL = API_BASE + "get-catch-media";
 
 // Primary fields shown in this exact order
 const FIELD_ORDER = [

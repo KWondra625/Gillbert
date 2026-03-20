@@ -1,10 +1,5 @@
-﻿const N8N_BASE_URL = "https://api.builtbykw.net";
-const WEBHOOK_PATH = "/webhook/";
-const API_KEY = 'sj30z42c9e0nIzchc5u';
-
-const SAS_WEBHOOK_URL    = N8N_BASE_URL + WEBHOOK_PATH + "uploads/sas";
+﻿const SAS_WEBHOOK_URL    = N8N_BASE_URL + WEBHOOK_PATH + "uploads/sas";
 const COMMIT_WEBHOOK_URL = N8N_BASE_URL + WEBHOOK_PATH + "uploads/commit";
-const CATCHES_GET_URL    = N8N_BASE_URL + WEBHOOK_PATH + "gillbert/get-catches";
 
 const REDIRECT_DELAY = 20; // seconds
 
