@@ -38,7 +38,7 @@ const FIELD_LABELS = {
 };
 
 // Fields excluded from all loops (handled explicitly)
-const EXCLUDE_FIELDS = new Set(['catchId', 'fullSummary', 'headline', ...FIELD_ORDER, ...AUDIT_FIELDS]);
+const EXCLUDE_FIELDS = new Set(['catchNumber', 'fullSummary', 'headline', ...FIELD_ORDER, ...AUDIT_FIELDS]);
 
 const el = {
   status:           document.getElementById('status'),
@@ -107,17 +107,17 @@ function camelToLabel(key) {
     .trim();
 }
 
-function getCatchIdFromUrl() {
+function getCatchNumberFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  return params.get('catchId');
+  return params.get('catchNumber');
 }
 
-async function loadCatchDetails(catchId) {
+async function loadCatchDetails(catchNumber) {
   try {
     showLoading();
     setStatus("Loading catch details...");
 
-    const url = `${CATCHES_GET_URL}?catchId=${encodeURIComponent(catchId)}`;
+    const url = `${CATCHES_GET_URL}?catchNumber=${encodeURIComponent(catchNumber)}`;
     const res = await fetch(url, {
       headers: { "X-API-Key": API_KEY },
     });
@@ -155,9 +155,9 @@ async function loadCatchDetails(catchId) {
 }
 
 function renderDetails(catchData) {
-  const catchId = catchData.catchId || "Unknown";
+  const catchNumber = catchData.catchNumber || "Unknown";
 
-  document.title = `${catchId} · Gillbert`;
+  document.title = `${catchNumber} · Gillbert`;
 
   const hasValue = (key) => catchData[key] !== null && catchData[key] !== undefined && catchData[key] !== '';
 
@@ -194,7 +194,7 @@ function renderDetails(catchData) {
   el.detailsContainer.innerHTML = `
     <div class="detail-card">
       <div class="detail-card-header">
-        <h2>${escapeHtml(catchId)} 🎣</h2>
+        <h2>${escapeHtml(catchNumber)} 🎣</h2>
       </div>
       <div class="detail-card-section-label">Catch Details</div>
       <div class="detail-card-body">
@@ -217,10 +217,10 @@ function renderDetails(catchData) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  const catchId = getCatchIdFromUrl();
+  const catchNumber = getCatchNumberFromUrl();
 
-  if (!catchId) {
-    setStatus("No catch ID provided.", true);
+  if (!catchNumber) {
+    setStatus("No catch number provided.", true);
     el.detailsContainer.innerHTML = `
       <div class="detail-card">
         <div class="detail-card-body">
@@ -231,7 +231,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // Render catch details first (card must exist for media container), then fetch media
-  loadCatchDetails(catchId).then(() => loadCatchMedia(catchId));
+  loadCatchDetails(catchNumber).then(() => loadCatchMedia(catchNumber));
 
   // Lightbox close handlers
   el.lightboxClose.addEventListener('click', closeLightbox);
@@ -256,10 +256,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // ─── Media ───────────────────────────────────────────────────────
 
-async function loadCatchMedia(catchId) {
+async function loadCatchMedia(catchNumber) {
   let items = [];
   try {
-    const url = `${CATCH_MEDIA_GET_URL}?catchId=${encodeURIComponent(catchId)}`;
+    const url = `${CATCH_MEDIA_GET_URL}?catchNumber=${encodeURIComponent(catchNumber)}`;
     const res = await fetch(url, { headers: { "X-API-Key": API_KEY } });
     if (!res.ok) throw new Error(`Media GET failed: ${res.status}`);
     const data = await res.json();
@@ -342,8 +342,8 @@ function renderMedia(items) {
   const container = document.getElementById('mediaContainer');
   if (!container) return;
 
-  const catchId = getCatchIdFromUrl();
-  const uploadBtn = `<a href="./media-upload.html?catchId=${encodeURIComponent(catchId)}" class="detail-upload-btn">⬆️ Upload Media</a>`;
+  const catchNumber = getCatchNumberFromUrl();
+  const uploadBtn = `<a href="./media-upload.html?catchNumber=${encodeURIComponent(catchNumber)}" class="detail-upload-btn">⬆️ Upload Media</a>`;
 
   const photos = items.filter(m => m.mediaType === 'Photo');
   const videos = items.filter(m => m.mediaType === 'Video');

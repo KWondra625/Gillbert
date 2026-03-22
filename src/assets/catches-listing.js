@@ -109,7 +109,7 @@ function renderPage() {
 
 function renderCatchCard(catchData) {
   const {
-    catchId = "Unknown",
+    catchNumber = "Unknown",
     anglerName = "Unknown",
     fishSpeciesName = "Unknown",
     length = "N/A",
@@ -126,7 +126,7 @@ function renderCatchCard(catchData) {
   return `
     <div class="catch-card">
       <div class="catch-card-header">
-        <h2 class="catch-id">${escapeHtml(catchId)}</h2>
+        <h2 class="catch-id">${escapeHtml(catchNumber)}</h2>
       </div>
       <div class="catch-card-body">
         <div class="catch-field">
@@ -147,7 +147,7 @@ function renderCatchCard(catchData) {
         </div>
       </div>
       <div class="catch-card-footer">
-        <a href="./catch-details.html?catchId=${encodeURIComponent(catchId)}" class="card-button">
+        <a href="./catch-details.html?catchNumber=${encodeURIComponent(catchNumber)}" class="card-button">
           🔍 View Details
         </a>
       </div>
