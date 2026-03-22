@@ -19,8 +19,8 @@ const el = {
   countdown:        document.getElementById('countdown'),
 };
 
-function getCatchIdFromUrl() {
-  return new URLSearchParams(window.location.search).get('catchId');
+function getCatchNumberFromUrl() {
+  return new URLSearchParams(window.location.search).get('catchNumber');
 }
 
 function setStatus(msg) {
@@ -46,24 +46,24 @@ function formatDate(value) {
 
 // --- Catch Context Card -------------------------------------------------------
 
-async function loadCatchDetails(catchId) {
+async function loadCatchDetails(catchNumber) {
   try {
-    const url = `${CATCHES_GET_URL}?catchId=${encodeURIComponent(catchId)}`;
+    const url = `${CATCHES_GET_URL}?catchNumber=${encodeURIComponent(catchNumber)}`;
     const res = await fetch(url, { headers: { "X-API-Key": API_KEY } });
     if (!res.ok) throw new Error(`GET failed: ${res.status}`);
     const data = await res.json();
     const catchData = Array.isArray(data) ? data[0] : data;
-    renderCatchCard(catchId, catchData);
-    document.title = `Upload to ${catchId} · Gillbert`;
+    renderCatchCard(catchNumber, catchData);
+    document.title = `Upload to ${catchNumber} · Gillbert`;
   } catch (err) {
     console.error(err);
-    el.catchCard.innerHTML = `<div class="catch-card-id">${escapeHtml(catchId)}</div><p class="catch-card-error">Could not load catch details.</p>`;
+    el.catchCard.innerHTML = `<div class="catch-card-id">${escapeHtml(catchNumber)}</div><p class="catch-card-error">Could not load catch details.</p>`;
   }
 }
 
-function renderCatchCard(catchId, data) {
+function renderCatchCard(catchNumber, data) {
   if (!data) {
-    el.catchCard.innerHTML = `<div class="catch-card-id">${escapeHtml(catchId)}</div>`;
+    el.catchCard.innerHTML = `<div class="catch-card-id">${escapeHtml(catchNumber)}</div>`;
     return;
   }
 
@@ -75,7 +75,7 @@ function renderCatchCard(catchId, data) {
   ].filter(Boolean);
 
   el.catchCard.innerHTML = `
-    <div class="catch-card-id">${escapeHtml(catchId)}</div>
+    <div class="catch-card-id">${escapeHtml(catchNumber)}</div>
     ${rows.map(([label, value]) => `
       <div class="catch-card-row">
         <span class="catch-card-label">${label}</span>
@@ -85,12 +85,12 @@ function renderCatchCard(catchId, data) {
 
 // --- Upload ------------------------------------------------------------------
 
-async function getSasUrls(catchId, files) {
+async function getSasUrls(catchNumber, files) {
   const res = await fetch(SAS_WEBHOOK_URL, {
     method: "POST",
     headers: { "X-API-Key": API_KEY, "Content-Type": "application/json" },
     body: JSON.stringify({
-      catchId,
+      catchNumber,
       files: files.map(f => ({ name: f.name, size: f.size, type: f.type })),
     }),
   });
@@ -112,11 +112,11 @@ async function uploadOne(uploadUrl, file) {
   if (!res.ok) throw new Error(`Azure PUT failed: ${res.status} ${await res.text()}`);
 }
 
-async function postUploadMetadata(catchId, uploads) {
+async function postUploadMetadata(catchNumber, uploads) {
   const res = await fetch(COMMIT_WEBHOOK_URL, {
     method: "POST",
     headers: { "X-API-Key": API_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ catchId, uploads }),
+    body: JSON.stringify({ catchNumber, uploads }),
   });
   const text = await res.text();
   if (!res.ok) throw new Error(`Commit webhook failed: ${res.status} ${text}`);
@@ -125,8 +125,8 @@ async function postUploadMetadata(catchId, uploads) {
 
 // --- Success & Redirect -------------------------------------------------------
 
-function startSuccessCountdown(catchId) {
-  const detailsUrl = `./catch-details.html?catchId=${encodeURIComponent(catchId)}`;
+function startSuccessCountdown(catchNumber) {
+  const detailsUrl = `./catch-details.html?catchNumber=${encodeURIComponent(catchNumber)}`;
   el.successBackBtn.href = detailsUrl;
 
   let remaining = REDIRECT_DELAY;
@@ -146,7 +146,7 @@ function startSuccessCountdown(catchId) {
 
 el.uploadBtn.addEventListener('click', async () => {
   el.log.textContent = "";
-  const catchId = getCatchIdFromUrl();
+  const catchNumber = getCatchNumberFromUrl();
   const files = Array.from(el.files.files || []);
 
   if (!files.length) return setStatus("Pick at least one photo or video.");
@@ -155,10 +155,10 @@ el.uploadBtn.addEventListener('click', async () => {
     el.uploadBtn.disabled = true;
     el.loadingIndicator.classList.add('visible');
     setStatus("Requesting upload slots...");
-    log(`Catch: ${catchId}`);
+    log(`Catch: ${catchNumber}`);
     log(`Files: ${files.length}`);
 
-    const { uploads } = await getSasUrls(catchId, files);
+    const { uploads } = await getSasUrls(catchNumber, files);
 
     setStatus("Reeling files into the cloud...");
     for (let i = 0; i < uploads.length; i++) {
@@ -170,7 +170,7 @@ el.uploadBtn.addEventListener('click', async () => {
 
     log(`\nDropping your catch in Gillbert's digital live well...`);
     setStatus("Stocking the live well...");
-    await postUploadMetadata(catchId, uploads);
+    await postUploadMetadata(catchNumber, uploads);
     log(`✅ Locked in — your catch is fully documented!`);
 
     el.loadingIndicator.classList.remove('visible');
@@ -178,7 +178,7 @@ el.uploadBtn.addEventListener('click', async () => {
 
     el.uploadState.classList.add('hidden');
     el.successState.classList.remove('hidden');
-    startSuccessCountdown(catchId);
+    startSuccessCountdown(catchNumber);
 
   } catch (err) {
     console.error(err);
@@ -192,17 +192,17 @@ el.uploadBtn.addEventListener('click', async () => {
 // --- Init --------------------------------------------------------------------
 
 window.addEventListener("DOMContentLoaded", () => {
-  const catchId = getCatchIdFromUrl();
+  const catchNumber = getCatchNumberFromUrl();
 
-  if (!catchId) {
+  if (!catchNumber) {
     el.uploadState.classList.add('hidden');
     el.noCatchState.classList.remove('hidden');
     return;
   }
 
-  const detailsUrl = `./catch-details.html?catchId=${encodeURIComponent(catchId)}`;
+  const detailsUrl = `./catch-details.html?catchNumber=${encodeURIComponent(catchNumber)}`;
   el.backToCatch.href = detailsUrl;
 
-  loadCatchDetails(catchId);
+  loadCatchDetails(catchNumber);
   setStatus("Ready to upload.");
 });

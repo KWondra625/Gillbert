@@ -12,7 +12,7 @@ const FIELD_ORDER = [
 ];
 
 // Audit fields shown in a separate muted section
-const AUDIT_FIELDS = ['recordSource', 'createdAt', 'updatedAt'];
+const AUDIT_FIELDS = ['id', 'recordSource', 'createdAt', 'updatedAt'];
 
 // Fields whose values are date/times and should be formatted for readability
 const DATETIME_FIELDS = new Set(['caughtWhen', 'createdAt', 'updatedAt']);
